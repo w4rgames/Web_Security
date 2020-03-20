@@ -13,40 +13,40 @@ switch(@$_GET["action"])
 {
 	// Demande de création de compte
 	case "creer_compte";
-		
+
 		// Vérification de l'existance des variables minimales
 		if(isset($_POST["login"]) && isset($_POST["password1"]) && ($_POST["password1"] != "") && isset($_POST["password2"]) && ($_POST["password1"]==$_POST["password2"]))
 		{
 			switch(@$_SESSION["niveau"])
 			{
-				case NIVEAU_1;	
+				case NIVEAU_1;
 					$requete = "INSERT INTO comptes VALUES('','" . $_POST["login"] . "','" . md5($_POST["password1"]) . "','$droit_par_defaut','pas_de_photo.gif','" . $_POST["email"] . "')";
-					$erreur = mysql_error();
+					$erreur = mysqli_error();
 				break;
-				
-				case NIVEAU_2;	
+
+				case NIVEAU_2;
 					$requete = "INSERT INTO comptes VALUES('','" . addslashes($_POST["login"]) . "','" . md5($_POST["password1"]) . "','$droit_par_defaut','pas_de_photo.gif','" . addslashes($_POST["email"]) . "')";
-					$erreur = mysql_error();
+					$erreur = mysqli_error();
 				break;
-				
-				case NIVEAU_3;	
+
+				case NIVEAU_3;
 					$requete = "INSERT INTO comptes VALUES('','" . addslashes($_POST["login"]) . "','" . md5($_POST["password1"]) . "','$droit_par_defaut','pas_de_photo.gif','" . addslashes($_POST["email"]) . "')";
 					$erreur = "";
-				break;			
+				break;
 			}
-			$resultat = mysql_query($requete);
+			$resultat = mysqli_query($requete);
 			if($resultat){
 				echo "<font color=blue>-> Compte créé</font>";
 			}else{
 				echo "<font color=red>-> Compte non créé </font>" . $erreur;
-			}		
+			}
 		}
 		else
 		{
 			// Les variables ne sont pas définies ? bizzare
 			include("include/gestion_piratage.php");
 		}
-	break;			
+	break;
 
 	default:
 	echo "
@@ -75,7 +75,7 @@ switch(@$_GET["action"])
 		<tr>
 			<td align="right">E-Mail : </td>
 			<td><input type="email" name="email" size="20"></td>
-		</tr>		
+		</tr>
 		<tr>
 			<td colspan="2" align="center"><br><input type="submit" value="Valider"></td>
 		</tr>

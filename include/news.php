@@ -8,11 +8,11 @@
 
 	// On récupére les news de la bdd
 	$requete = "SELECT * FROM news";
-	$resultat = mysql_query($requete);
-	
+	$resultat = mysqli_query($requete);
+
 	// Et on les affiche
 	$nb_news = 0;
-	while($une_news = mysql_fetch_array($resultat))
+	while($une_news = mysqli_fetch_array($resultat))
 	{
 		echo "
 		<center>
@@ -22,12 +22,12 @@
 				</tr>
 				<tr>
 					<td id='news_message'><blockquote><br>" . $une_news["news_message"] . "</blockquote></td>
-				</tr>				
+				</tr>
 			</table>
 		</center><br>";
 		$nb_news++;
 	}
-	
+
 	if($nb_news == 0)
 	{
 		echo "<br><center>Pas de news</center><br>";

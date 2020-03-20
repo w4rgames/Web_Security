@@ -1,8 +1,8 @@
 
-<?php	
+<?php
 	// Verification : Si on a les droits pour voir la page ou que le niveau de sureté soit suffisant
 	if(($_SESSION["droits"]== '1') || ($_SESSION["niveau"] != NIVEAU_3))
-	{ 
+	{
 ?>
 
 <center>
@@ -18,43 +18,43 @@
 switch(@$_GET["action"])
 {
 	case "ajouter_news";
-	
+
 		// Si les variables minimales sont définies
 		if(isset($_POST["news_titre"]) && isset($_POST["news_message"]))
 		{
 			switch(@$_SESSION["niveau"])
 			{
-				// Insertion de news pour niveau 1 : 
-				case NIVEAU_1;	
+				// Insertion de news pour niveau 1 :
+				case NIVEAU_1;
 					$requete = "INSERT INTO news VALUES('','" . addslashes($_POST["news_titre"]) . "','" . addslashes($_POST["news_message"]) . "')";
 				break;
-				
-				case NIVEAU_2;	
+
+				case NIVEAU_2;
 					$requete = 'INSERT INTO news VALUES("","' . $_POST["news_titre"] . '","' . $_POST["news_message"] . '")';
 				break;
-				
-				case NIVEAU_3;	
+
+				case NIVEAU_3;
 					$requete = "INSERT INTO news VALUES('','" . addslashes(htmlentities($_POST["news_titre"])) . "','" . addslashes(htmlentities($_POST["news_message"])) . "')";
-				break;			
+				break;
 			}
-			$resultat = mysql_query($requete);
+			$resultat = mysqli_query($requete);
 			if($resultat){
 				echo "<font color=blue>-> News insérée</font>";
 			}else{
 				echo "<font color=red>-> News non insérée</font>";
-			}			
+			}
 		}
 		else
 		{
 			include("include/gestion_piratage.php");
 		}
-	break;			
+	break;
 
 	default:
 	echo "
 			<b><i>Vous pouvez ici créer des news</i></b><br><br>
 	";
-	
+
 	break;
 }
 ?>
@@ -78,10 +78,10 @@ switch(@$_GET["action"])
 		</tr>
 	</table>
 	</center>
-	
+
 </form>
 
-<?php	
+<?php
 	}
 	else
 	{
