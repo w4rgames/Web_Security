@@ -1,0 +1,8 @@
+Il y a juste a créer une base nommée 
+
+hack_trainer
+
+sous mysql
+
+user : root
+pwd : aucun

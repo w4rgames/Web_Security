@@ -1,0 +1,51 @@
+
+#bloc_centre
+{
+	width:auto;
+	float:none;
+	margin-left:17%;
+	margin-right:18%;
+}
+
+#bloc_gauche
+{
+	margin-left:0%;
+	width:15%;
+	float:left;
+}
+
+#bloc_droite
+{
+	margin-right:0%;
+	width:15%;
+	float:right;
+}
+
+#table_choix_niveau{
+	width:auto;
+}
+
+.text_menu
+{
+	margin-left:0px;
+	margin-right:0px;
+}
+
+#news_table
+{
+	border: 1px #7F9DB9 solid;
+	text-align:left;
+	width:50%;
+}
+
+#news_titre
+{
+	background-color:#C3D9FF;
+	color:#000000;
+}
+
+#news_message
+{
+	background-color:#D2E5ED;
+	color:#000000;
+}
